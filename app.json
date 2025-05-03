@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/icono.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.sigleto.CalculoAcciones"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "83c2d8fd-b645-4e30-8584-ba6946cfe449"
+      }
     }
   }
 }

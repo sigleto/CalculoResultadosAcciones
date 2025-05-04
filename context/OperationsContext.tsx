@@ -14,11 +14,13 @@ export type Operation = {
 type OperationsContextType = {
   operations: Operation[];
   addOperation: (op: Operation) => void;
+  deleteOperation: (id: string) => void;
 };
 
 const OperationsContext = createContext<OperationsContextType>({
   operations: [],
   addOperation: () => {},
+  deleteOperation: () => {},
 });
 
 export const OperationsProvider = ({
@@ -52,9 +54,20 @@ export const OperationsProvider = ({
       console.error("Error saving operation", err);
     }
   };
+  const deleteOperation = async (id: string) => {
+    const updated = operations.filter((op) => op.id !== id);
+    setOperations(updated);
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    } catch (err) {
+      console.error("Error deleting operation", err);
+    }
+  };
 
   return (
-    <OperationsContext.Provider value={{ operations, addOperation }}>
+    <OperationsContext.Provider
+      value={{ operations, addOperation, deleteOperation }}
+    >
       {children}
     </OperationsContext.Provider>
   );

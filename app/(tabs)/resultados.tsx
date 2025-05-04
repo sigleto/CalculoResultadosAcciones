@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, ScrollView, Text, View } from "react-native";
 import { useOperations } from "../../context/OperationsContext";
-import { exportVentasToExcel } from "../../utils/exportToExcel";
+import { exportVentasToExcel } from "../../utils/exportResultadosExcel";
 
 export default function Resultados() {
   const { operations } = useOperations();
@@ -37,16 +37,17 @@ export default function Resultados() {
 
     let accionesAcumuladas = 0;
     let totalInvertido = 0;
+    let pmp = 0; // Mantener el PMP fuera de los condicionales
     let ventas: Venta[] = [];
 
     for (const op of sortedOps) {
       if (op.type === "buy") {
         accionesAcumuladas += op.shares;
         totalInvertido += op.totalAmount;
+        // Recalcular PMP SOLO después de cada compra
+        pmp = accionesAcumuladas > 0 ? totalInvertido / accionesAcumuladas : 0;
       } else if (op.type === "sell") {
-        // PMP justo antes de la venta
-        const pmp =
-          accionesAcumuladas > 0 ? totalInvertido / accionesAcumuladas : 0;
+        // Usar el PMP actual para valorar la venta
         const costoVenta = op.shares * pmp;
         const beneficio = op.totalAmount - costoVenta;
 
@@ -63,7 +64,8 @@ export default function Resultados() {
 
         // Actualizar inventario después de la venta
         accionesAcumuladas -= op.shares;
-        totalInvertido -= costoVenta; // restar el coste proporcional, no el ingreso
+        totalInvertido -= costoVenta; // restar el coste proporcional
+        // NO recalcular PMP después de la venta
       }
     }
     ventasPorEmpresa[empresa] = ventas;

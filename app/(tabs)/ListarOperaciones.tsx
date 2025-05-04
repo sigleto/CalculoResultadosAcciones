@@ -1,10 +1,17 @@
 import React from "react";
-import { Button, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Button,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useOperations } from "../../context/OperationsContext";
 import { exportOperacionesToExcel } from "../../utils/exportToExcel";
 
 export default function ListaOperaciones() {
-  const { operations } = useOperations();
+  const { operations, deleteOperation } = useOperations();
 
   if (operations.length === 0) {
     return (
@@ -16,7 +23,6 @@ export default function ListaOperaciones() {
     );
   }
 
-  // Agrupar por empresa
   const operacionesPorEmpresa = operations.reduce<
     Record<string, typeof operations>
   >((acc, op) => {
@@ -24,6 +30,21 @@ export default function ListaOperaciones() {
     acc[op.company].push(op);
     return acc;
   }, {});
+
+  const confirmarEliminacion = (id: string) => {
+    Alert.alert(
+      "Eliminar operación",
+      "¿Estás seguro de que deseas eliminar esta operación?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: () => deleteOperation(id),
+        },
+      ]
+    );
+  };
 
   return (
     <ScrollView style={{ padding: 16 }}>
@@ -55,6 +76,19 @@ export default function ListaOperaciones() {
                 <Text>📥 Tipo: {op.type === "buy" ? "Compra" : "Venta"}</Text>
                 <Text>🔢 Acciones: {op.shares}</Text>
                 <Text>💶 Total: {op.totalAmount.toFixed(2)} €</Text>
+                <TouchableOpacity
+                  onPress={() => deleteOperation(op.id)}
+                  style={{
+                    backgroundColor: "#ff5252",
+                    paddingVertical: 4,
+                    paddingHorizontal: 8,
+                    borderRadius: 4,
+                    alignSelf: "flex-start",
+                    marginTop: 6,
+                  }}
+                >
+                  <Text style={{ color: "white", fontSize: 12 }}>Eliminar</Text>
+                </TouchableOpacity>
               </View>
             ))}
           </View>
